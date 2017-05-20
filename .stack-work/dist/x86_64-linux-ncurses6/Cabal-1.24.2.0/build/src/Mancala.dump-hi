@@ -1,0 +1,70 @@
+
+==================== FINAL INTERFACE ====================
+2017-05-20 19:52:49.574935634 UTC
+
+interface mancala-project-0.1.0.0-KDWbFTps0CS8z09arZFqd6:Mancala 8002
+  interface hash: 9978f404bf2851555c74f3f76ecd2508
+  ABI hash: 6c9821da114dd19033dd6a97e7d20b0a
+  export-list hash: f6a983bd997e8c529f8a263175e18e18
+  orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
+  flag hash: bf8f5ed9f57c603c45732fbe6e5757d5
+  sig of: Nothing
+  used TH splices: False
+  where
+exports:
+  Mancala.testFunc
+module dependencies:
+package dependencies: base-4.9.1.0* ghc-prim-0.5.0.0
+                      integer-gmp-1.0.0.1
+orphans: base-4.9.1.0:GHC.Base base-4.9.1.0:GHC.Float
+family instance modules: base-4.9.1.0:Control.Applicative
+                         base-4.9.1.0:Data.Either base-4.9.1.0:Data.Functor.Const
+                         base-4.9.1.0:Data.Monoid base-4.9.1.0:Data.Type.Equality
+                         base-4.9.1.0:GHC.Generics base-4.9.1.0:GHC.IO.Exception
+                         base-4.9.1.0:GHC.TypeLits
+import  -/  base-4.9.1.0:Prelude 22dd289b8469a8fa8dc81cab7b237771
+import  -/  base-4.9.1.0:System.IO e4a64a8e3dce8616da54f0ee7104f7db
+import  -/  ghc-prim-0.5.0.0:GHC.Types 89f8de4f08018c9177c98d979eae0e45
+ae344f39aa0454df5a5c85d06d5f267e
+  $trModule :: GHC.Types.Module
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.Module
+                   Mancala.$trModule2
+                   Mancala.$trModule1) -}
+4aeb1f9b29e2ae5c08a5761e0e24f7cd
+  $trModule1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "Mancala"#) -}
+027cc691f1ed1adc1cffee566d4508a9
+  $trModule2 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS
+                   "mancala-project-0.1.0.0-KDWbFTps0CS8z09arZFqd6"#) -}
+e37dae27c1cc1d3133a4bc041e169429
+  testFunc :: GHC.Types.IO ()
+  {- Arity: 1, Strictness: <S,U>,
+     Unfolding: InlineRule (0, True, True)
+                Mancala.testFunc1 `cast` (Sym (GHC.Types.N:IO[0] <()>_R)) -}
+8b7757e107f098b47b4208b963e4cb6f
+  testFunc1 ::
+    GHC.Prim.State# GHC.Prim.RealWorld
+    -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
+  {- Arity: 1, Strictness: <S,U>,
+     Unfolding: (\ (eta :: GHC.Prim.State#
+                             GHC.Prim.RealWorld)[OneShot] ->
+                 GHC.IO.Handle.Text.hPutStr2
+                   GHC.IO.Handle.FD.stdout
+                   Mancala.testFunc2
+                   GHC.Types.True
+                   eta) -}
+f3aebe16dbf5a3132427a025509fd62b
+  testFunc2 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "testFunc"#) -}
+vectorised variables:
+vectorised tycons:
+vectorised reused tycons:
+parallel variables:
+parallel tycons:
+trusted: safe
+require own pkg trusted: False
+
