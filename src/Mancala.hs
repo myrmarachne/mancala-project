@@ -3,11 +3,14 @@ module Mancala
     ( MancalaBoard (MkMancalaBoard),
       Player,
       initMancalaBoard,
-      getCurrentPlayer,
       switchPlayer,
       initPlayerList,
       getBoardSideForPlayer,
-      getPointsForPlayer
+      getPointsForPlayer,
+      checkIfMovePossible,
+      currentPlayer,
+
+      makeMove
     ) where
 
 import Data.List
@@ -19,7 +22,10 @@ import Data.Maybe
   that are representing the amount of stones for each player.
   CurrentPlayer represents the current player.
 -}
-data MancalaBoard = MkMancalaBoard CurrentPlayer [BoardSide]
+data MancalaBoard = MkMancalaBoard
+  { currentPlayer   :: CurrentPlayer
+  , boardSidesList  :: [BoardSide]
+  }
   deriving Show -- TODO: Zrobic instance wyswietlajace
 
 {- |
@@ -81,7 +87,7 @@ findBoardSide boardSides player =
     otherwise -> error "No BoardSide connected with provided player in this list"
 
 -- |Function that checks if all of pits on his side are empty.
-checkIfPlayerEnded :: BoardSide -> Boolean
+checkIfPlayerEnded :: BoardSide -> Bool
 checkIfPlayerEnded boardSide = all (== 0) (boardSideBoard boardSide)
 
 
@@ -103,9 +109,8 @@ initMancalaBoard :: MancalaBoard
 initMancalaBoard = MkMancalaBoard PlayerA
   (map (\player -> (MkBoardSide player (replicate numberOfPits initialNumberOfStones) 0)) initPlayerList)
 
--- |Function that returns the current player.
-getCurrentPlayer :: MancalaBoard -> Player
-getCurrentPlayer (MkMancalaBoard currentPlayer _) = currentPlayer
+getBoardSidesList :: MancalaBoard -> [BoardSide]
+getBoardSidesList (MkMancalaBoard _ boardSides) = boardSides
 
 {- |
   Function that returns current score for the player.
@@ -117,17 +122,48 @@ getPointsForPlayer mancalaBoard player =
   sum (boardSideBoard boardSide) + (boardSideHouse boardSide)
   where boardSide = getBoardSideForPlayer mancalaBoard player
 
-  {- |
-    Function which takes a MancalaBoard and an integer representing
-    the number of pit, from which stones are picked.
-  -}
-{-
+-- |Function that checks if wished move is possible.
+checkIfMovePossible :: MancalaBoard -> Int -> Bool
+checkIfMovePossible _ pitNumber
+  | pitNumber < 0 = False
+  | pitNumber >= numberOfPits = False
+checkIfMovePossible _ _ = True
+
+{- |
+  Function which takes a MancalaBoard and an integer representing
+  the number of pit, from which stones are picked.
+  If number of stones on the chosen pit is equal to
+  (numberOfPits - pitNumber) + 14k for some integer k, than
+  the move will end in the house of the current player.
+-}
 makeMove :: MancalaBoard -> Int -> MancalaBoard
 makeMove mancalaBoard pitNumber =
-  MancalaBoard
-    (nextPlayer initPlayerList)
-    [(MkBoardSide PlayerA newBoardSideA), (MkBoardSide PlayerB newBoardSideB)]
+  MkMancalaBoard
+    nextPlayer [currentBoardSide, anotherBoardSide]
+--    [(MkBoardSide PlayerA newBoardSideA x), (MkBoardSide PlayerB y)]
   where
-    currentPlayer = getCurrentPlayer mancalaBoard
-    nextPlayer = switchPlayer currentPlayer
--}
+    nextPlayer =
+      if
+        (stonesNumber + pitNumber - numberOfPits) `mod` 14 == 0
+      then
+        currentPlayerM
+      else
+        (switchPlayer currentPlayerM initPlayerList)
+    stonesNumber = (boardSideBoard currentBoardSide) !! pitNumber
+    currentBoardSide = getBoardSideForPlayer mancalaBoard currentPlayerM
+    --currentHouse = boardSideHouse currentBoardSide
+    currentPlayerM = currentPlayer mancalaBoard
+
+    anotherPlayer = switchPlayer currentPlayerM initPlayerList
+    anotherBoardSide = getBoardSideForPlayer mancalaBoard anotherPlayer
+  --  anotherBoard = boardSideBoard anotherBoardSide
+--    anotherHouse = boardSideHouse anotherBoardSide
+    --y = anotherBoard anotherHouse
+    --x = currentBoard
+
+-- |Type added for better visibility. Used in placeStones.
+type Stones = Int
+
+-- |Function that for a given number of stones places them in the pits of two boards.
+--placeStones :: Stones -> Player -> [BoardSide] -> [BoardSide]
+--placeStones 0 _ _
