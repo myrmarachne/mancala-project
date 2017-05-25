@@ -7,7 +7,13 @@ module Mancala
       getPointsForPlayer,
       checkIfMovePossible,
       getWinner,
-      makeMove
+      makeMove,
+      gameOver,
+      initialNumberOfStones,
+      numberOfPits,
+      getBoardSidesList,
+      getPlayer,
+      possibleMoves
     ) where
 
 import Data.List (maximumBy)
@@ -95,9 +101,18 @@ checkIfMovePossible mancalaBoard pitNumber
     stonesNumber = getBoard (boards !! 0) !! pitNumber
     boards = getBoardSidesList mancalaBoard
 
-getWinner :: MancalaBoard Int -> (Int, Player)
-getWinner mancalaBoard =
-   maximumBy (comparing fst) (zip (map (getPointsForPlayer mancalaBoard) initPlayerList) initPlayerList)
+possibleMoves :: MancalaBoard Int -> [Int]
+possibleMoves mancalaBoard = filter (checkIfMovePossible mancalaBoard) [0..5]
+
+gameOver :: MancalaBoard Int -> Bool
+gameOver mancalaBoard = all (== True) $ map (checkIfPlayerEnded) (getBoardSidesList mancalaBoard)
+
+getWinner :: MancalaBoard Int -> [Player]
+getWinner mancalaBoard
+  | (fst winner) == (numberOfPits * initialNumberOfStones) = initPlayerList
+  | otherwise = map snd [winner]
+  where
+    winner = maximumBy (comparing fst) (zip (map (getPointsForPlayer mancalaBoard) initPlayerList) initPlayerList)
 
 -- |Initial placing stones on Board.
 -- Na razie brak mozliwosci wyboru gracza. Na razie gre zaczyna zawsze gracz A. (TODO)
