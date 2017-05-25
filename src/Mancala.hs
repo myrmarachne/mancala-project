@@ -1,24 +1,17 @@
 -- Na razie udostepniane sa wszystkie funkcje - Na koniec dopracowac
 module Mancala
     ( MancalaBoard (MkMancalaBoard),
+      BoardSide (MkBoardSide),
       Player,
       initMancalaBoard,
       initPlayerList,
-      getPointsForPlayer,
-      checkIfMovePossible,
-      getWinner,
       makeMove,
-      gameOver,
-      initialNumberOfStones,
-      numberOfPits,
       getBoardSidesList,
       getPlayer,
-      possibleMoves
+      getBoard,
+      initialNumberOfStones,
+      numberOfPits
     ) where
-
-import Data.List (maximumBy)
-import Data.Ord (comparing)
-
 
 --------------- CONSTANTS ---------------
 initialNumberOfStones = 4
@@ -68,51 +61,6 @@ data Player = PlayerA
 -- |Function that initializes players list for mancala.
 initPlayerList :: [Player]
 initPlayerList = [PlayerA, PlayerB]
-
--- |Function that returns BoardSide for a player
-getBoardSideForPlayer :: MancalaBoard a -> Player -> BoardSide a
-getBoardSideForPlayer mancalaBoard player
-  | getPlayer (boards !! 0) == player = boards !! 0
-  | otherwise  = boards !! 1
-  where boards = getBoardSidesList mancalaBoard
-
--- |Function that checks if all of pits on his side are empty.
-checkIfPlayerEnded :: (Eq a, Num a) => BoardSide a -> Bool
-checkIfPlayerEnded boardSide = all (== 0) (init $ getBoard boardSide)
-
-{- |
-  Function that returns current score for the player.
-  It is the amount of stones in the house, which belongs to that person, plus
-  amount of stones in every pit on the side of their board.
--}
-getPointsForPlayer :: MancalaBoard Int -> Player -> Int
-getPointsForPlayer mancalaBoard player =
-  sum (getBoard (getBoardSideForPlayer mancalaBoard player))
-
--- |Function that checks if wished move is possible. TODO
-checkIfMovePossible :: MancalaBoard Int -> Int -> Bool
-checkIfMovePossible _ pitNumber
-  | pitNumber < 0 = False
-  | pitNumber >= numberOfPits = False -- house'a tez nie mozna ruszac
-checkIfMovePossible mancalaBoard pitNumber
-  | stonesNumber < 1 = False
-  | otherwise = True
-  where
-    stonesNumber = getBoard (boards !! 0) !! pitNumber
-    boards = getBoardSidesList mancalaBoard
-
-possibleMoves :: MancalaBoard Int -> [Int]
-possibleMoves mancalaBoard = filter (checkIfMovePossible mancalaBoard) [0..5]
-
-gameOver :: MancalaBoard Int -> Bool
-gameOver mancalaBoard = all (== True) $ map (checkIfPlayerEnded) (getBoardSidesList mancalaBoard)
-
-getWinner :: MancalaBoard Int -> [Player]
-getWinner mancalaBoard
-  | (fst winner) == (numberOfPits * initialNumberOfStones) = initPlayerList
-  | otherwise = map snd [winner]
-  where
-    winner = maximumBy (comparing fst) (zip (map (getPointsForPlayer mancalaBoard) initPlayerList) initPlayerList)
 
 -- |Initial placing stones on Board.
 -- Na razie brak mozliwosci wyboru gracza. Na razie gre zaczyna zawsze gracz A. (TODO)
