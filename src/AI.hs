@@ -73,19 +73,15 @@ gameOver :: MancalaBoard Int -> Bool
 gameOver mancalaBoard = all (== True) $ map (checkIfPlayerEnded) (getBoardSidesList mancalaBoard)
 
 getWinner :: MancalaBoard Int -> [Player]
-getWinner mancalaBoard
-  | (fst winner) == (numberOfPits * initialNumberOfStones) = initPlayerList
-  | otherwise = map snd [winner]
-  where
-    winner = maximumBy (comparing fst) (zip (map (getPointsForPlayer mancalaBoard) initPlayerList) initPlayerList)
-
+getWinner mancalaBoard = filter (\x -> numberOfPits * initialNumberOfStones
+  <= (getPointsForPlayer mancalaBoard x)) initPlayerList
 
 getScore :: MancalaBoard Int -> Player -> Int -> Int
 getScore mancalaBoard player 0 = getPointsForPlayer mancalaBoard player
 getScore mancalaBoard player depth
   | gameOver mancalaBoard = if (getWinner mancalaBoard == [player])
-                              then initialNumberOfStones*numberOfPits*2 + 1
-                              else (-initialNumberOfStones*numberOfPits*2 - 1)
+                              then initialNumberOfStones * numberOfPits * 2 + 1
+                              else (-initialNumberOfStones * numberOfPits * 2 - 1)
   | otherwise = getScore (makeMove mancalaBoard (lookahead mancalaBoard (depth-1))) player (depth - 1)
 
 ---------------- PRZYKLADOWE PLANSZE PO KILKU RUCHACH --------------------------
