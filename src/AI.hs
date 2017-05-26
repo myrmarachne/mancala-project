@@ -9,9 +9,18 @@ import Data.Ord (comparing)
 
 type Move = Int
 
+{- |
+  Function that suggests a move with the highest score according to the score
+  of the player after a sequence of stepDepth moves, when fot n-th move
+  current plater chooses the best move according to stepDepth d_n.
+-}
 nextMove :: MancalaBoard Int -> Int -> Move
 nextMove mancalaBoard stepDepth = lookahead mancalaBoard stepDepth -- stepDepth >= 4
 
+{- |
+  Function that chooses a move with the highest score according to the score
+  of the player after a sequence of stepDepth moves.
+-}
 lookahead :: MancalaBoard Int -> Int -> Move
 lookahead mancalaBoard stepDepth = fst . (maximumBy (comparing snd)) $
   (map (\x -> (x, getScore (makeMove mancalaBoard x) player stepDepth)) (possibleMoves mancalaBoard))
@@ -37,7 +46,8 @@ getBoardSideForPlayer mancalaBoard player
   | getPlayer (boards !! 0) == player = boards !! 0
   | otherwise  = boards !! 1
   where boards = getBoardSidesList mancalaBoard
--- |Function that checks if wished move is possible. TODO
+
+-- |Function that checks if wished move is possible. TODO Sprawdzic czy poprawne
 checkIfMovePossible :: MancalaBoard Int -> Int -> Bool
 checkIfMovePossible _ pitNumber
   | pitNumber < 0 = False
@@ -48,10 +58,17 @@ checkIfMovePossible mancalaBoard pitNumber
   where
     stonesNumber = getBoard (boards !! 0) !! pitNumber
     boards = getBoardSidesList mancalaBoard
-
+{- |
+  Function that returns a list of possible moves for current player according to
+  the function checkIfMovePossible.
+ -}
 possibleMoves :: MancalaBoard Int -> [Int]
 possibleMoves mancalaBoard = filter (checkIfMovePossible mancalaBoard) [0..5]
 
+{- |
+  Function that checks if one of the player has won the game
+  (has all of his pits empty, excluding the house)
+ -}
 gameOver :: MancalaBoard Int -> Bool
 gameOver mancalaBoard = all (== True) $ map (checkIfPlayerEnded) (getBoardSidesList mancalaBoard)
 
