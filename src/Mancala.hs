@@ -96,7 +96,6 @@ initPlayerList = [PlayerA, PlayerB]
   player has got an empty house and every other pit of the board contains
   initialNumberOfStones stones.
 -}
--- Na razie brak mozliwosci wyboru gracza. Na razie gre zaczyna zawsze gracz A. (TODO)
 initMancalaBoard :: MancalaBoard Int
 initMancalaBoard = MkMancalaBoard
   (map (\player -> (MkBoardSide player ((replicate (numberOfPits) initialNumberOfStones) ++ [0]))) initPlayerList)
@@ -107,6 +106,7 @@ fun f = flip fmap (MkBoardSide PlayerA [0..6]) f
 move :: Int -> Int -> Int -> (Int -> Int)
 move pitNumber stones i
   | i == pitNumber =  const $ floor(shift / 13)
+  | (pitNumber < 0) && (i == numberOfPits) = id
   | i > pitNumber = (+ ceiling ((shift + 1) / 13))
   | otherwise = (+ floor (shift / 13))
   where

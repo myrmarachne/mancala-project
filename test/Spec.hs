@@ -76,7 +76,7 @@ makeMoveTestSuite = testGroup "Testing makeMove function"
     ),
   testCase "make move ending on pit with zero stones"
     (makeMove (MkMancalaBoard [MkBoardSide PlayerB [4, 1, 0, 4, 4, 4, 7], MkBoardSide PlayerA [4, 4, 4, 4, 4, 4, 2]]) 1 @?=
-       (MkMancalaBoard [MkBoardSide PlayerA [4, 4, 0, 4, 4, 4, 2], MkBoardSide PlayerB [4, 0, 0, 4, 4, 4, 12]])
+       (MkMancalaBoard [MkBoardSide PlayerA [4, 4, 4, 0, 4, 4, 2], MkBoardSide PlayerB [4, 0, 0, 4, 4, 4, 12]])
     )
   ]
 
