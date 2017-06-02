@@ -2,7 +2,7 @@
 module Mancala
     ( MancalaBoard (MkMancalaBoard),
       BoardSide (MkBoardSide),
-      Player,
+      Player (PlayerA, PlayerB),
       initMancalaBoard,
       initPlayerList,
       makeMove,
@@ -10,9 +10,12 @@ module Mancala
       getPlayer,
       getBoard,
       initialNumberOfStones,
-      numberOfPits
+      numberOfPits,
+      getCurrentPlayer
     ) where
 
+import Text.PrettyPrint.Boxes
+import Data.List
 
 ---------------------------------- CONSTANTS -----------------------------------
 {- |
@@ -34,7 +37,17 @@ numberOfPits = 6
   in the BoardSidesList belongs to the current player.
 -}
 newtype MancalaBoard a = MkMancalaBoard { getBoardSidesList  :: [BoardSide a] }
-  deriving Show -- TODO: Zrobic instance wyswietlajace
+
+instance (Show a) => Show (MancalaBoard a) where
+  show (MkMancalaBoard boards) =
+    render $ hsep 3 center1 $ map (vcat left) $
+     transpose
+     [headerBoxes,
+      [boardSideToPlayerBox $ boards !! 1] ++ (reverse $ boardSideToPitsAndHouseBoxes $ boards !! 1),
+      [boardSideToPlayerBox $ boards !! 0] ++ (boardSideToPitsAndHouseBoxes $ boards !! 0)]
+
+instance (Eq a) => Eq (MancalaBoard a) where
+  (==) (MkMancalaBoard boards1) (MkMancalaBoard boards2) = (boards1 !! 0) == (boards2 !! 0) && (boards1 !! 1) == (boards2 !! 1)
 
 {- |
   The BoardSide data type represents one side of the mancala Board for one player -
@@ -43,7 +56,7 @@ newtype MancalaBoard a = MkMancalaBoard { getBoardSidesList  :: [BoardSide a] }
 -}
 data BoardSide a = MkBoardSide { getPlayer :: Player,
                                  getBoard  :: Board a
-                               } deriving Show -- TODO.
+                               } deriving Show
 
 instance Functor BoardSide where
   fmap f (MkBoardSide player board) = MkBoardSide player (map f board)
@@ -52,6 +65,10 @@ instance Applicative BoardSide where
   pure x = MkBoardSide PlayerA (repeat x)
   (MkBoardSide _ board1) <*> (MkBoardSide player board2) =
     MkBoardSide player (zipWith ($) board1 board2)
+
+instance (Eq a) => Eq (BoardSide a) where
+  (==) (MkBoardSide player1 board1) (MkBoardSide player2 board2) =
+    player1 == player2 && board1 == board2
 
 {- |
   Board is a list consisting of numbers which are representing the amount of
@@ -65,7 +82,7 @@ type Board a = [a]
 -}
 data Player = PlayerA
             | PlayerB
-  deriving (Eq, Show)
+  deriving (Eq, Show, Enum, Bounded)
 
 ---------------------------------- FUNCTIONS ----------------------------------
 {-  |
@@ -135,6 +152,20 @@ makeMove mancalaBoard pitNumber =
     lastPit = (stonesNumber + pitNumber) `mod` 13
     extra = getBoard (boards !! 1) !! (numberOfPits - lastPit - 1) + 1
     parameters = [((-1), (stonesNumber + pitNumber - numberOfPits)), (pitNumber, stonesNumber)]
+
+
+getCurrentPlayer :: MancalaBoard Int -> Player
+getCurrentPlayer mancalaBoard = getPlayer $ (getBoardSidesList mancalaBoard) !! 0
+
+---------- Helper variables and functions for showing boards -------------------
+
+headerBoxes = [text "Pits", text "H"] ++ (map text $ map show [1..6]) ++ [text "H"]
+
+boardSideToPlayerBox :: BoardSide a -> Box
+boardSideToPlayerBox (MkBoardSide player _ ) = text $ show player
+
+boardSideToPitsAndHouseBoxes :: (Show a) => BoardSide a  -> [Box]
+boardSideToPitsAndHouseBoxes (MkBoardSide _ board) = [emptyBox 1 1] ++ map text (map show board)
 
 ---------------- PRZYKLADOWE PLANSZE PO KILKU RUCHACH --------------------------
 x = makeMove initMancalaBoard 4

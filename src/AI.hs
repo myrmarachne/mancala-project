@@ -1,6 +1,11 @@
 module AI
     (
-    nextMove
+    nextMove,
+    checkIfPlayerEnded,
+    gameOver,
+    getPointsForPlayer,
+    getWinner,
+    checkIfMovePossible
     ) where
 
 import Mancala
@@ -70,16 +75,16 @@ possibleMoves mancalaBoard = filter (checkIfMovePossible mancalaBoard) [0..5]
   (has all of his pits empty, excluding the house)
  -}
 gameOver :: MancalaBoard Int -> Bool
-gameOver mancalaBoard = all (== True) $ map (checkIfPlayerEnded) (getBoardSidesList mancalaBoard)
+gameOver mancalaBoard = any (== True) $ map (checkIfPlayerEnded) (getBoardSidesList mancalaBoard)
 
-getWinner :: MancalaBoard Int -> [Player]
-getWinner mancalaBoard = filter (\x -> numberOfPits * initialNumberOfStones
-  <= (getPointsForPlayer mancalaBoard x)) initPlayerList
+getWinner :: MancalaBoard Int -> Player
+getWinner mancalaBoard = (filter (\x -> numberOfPits * initialNumberOfStones
+  <= (getPointsForPlayer mancalaBoard x)) initPlayerList) !! 0
 
 getScore :: MancalaBoard Int -> Player -> Int -> Int
 getScore mancalaBoard player 0 = getPointsForPlayer mancalaBoard player
 getScore mancalaBoard player depth
-  | gameOver mancalaBoard = if (getWinner mancalaBoard == [player])
+  | gameOver mancalaBoard = if (getWinner mancalaBoard == player)
                               then initialNumberOfStones * numberOfPits * 2 + 1
                               else (-initialNumberOfStones * numberOfPits * 2 - 1)
   | otherwise = getScore (makeMove mancalaBoard (lookahead mancalaBoard (depth-1))) player (depth - 1)
