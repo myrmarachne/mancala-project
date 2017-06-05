@@ -1,17 +1,20 @@
--- Na razie udostepniane sa wszystkie funkcje - Na koniec dopracowac
 module Mancala
     ( MancalaBoard (MkMancalaBoard),
       BoardSide (MkBoardSide),
       Player (PlayerA, PlayerB),
       initMancalaBoard,
-      initPlayerList,
       makeMove,
       getBoardSidesList,
       getPlayer,
       getBoard,
       initialNumberOfStones,
       numberOfPits,
-      getCurrentPlayer
+      getCurrentPlayer,
+      checkIfPlayerEnded,
+      gameOver,
+      getPointsForPlayer,
+      getWinner,
+      checkIfMovePossible
     ) where
 
 import Text.PrettyPrint.Boxes
@@ -124,8 +127,8 @@ pick extra pitNumber stones i
 (<**>) :: [BoardSide (Int -> Int)] -> [BoardSide Int] -> [BoardSide Int]
 (<**>) = zipWith (<*>)
 
-xD :: (a -> b -> Int -> Int -> Int) -> [(a, b)] -> [BoardSide Int] -> [BoardSide Int]
-xD function parameters boards = (fun <$> (map (uncurry function) $ parameters)) <**> boards
+helperFunction :: (a -> b -> Int -> Int -> Int) -> [(a, b)] -> [BoardSide Int] -> [BoardSide Int]
+helperFunction function parameters boards = (fun <$> (map (uncurry function) $ parameters)) <**> boards
 
 {- |
   Function which takes a MancalaBoard and an integer representing the number of pit,
@@ -139,13 +142,13 @@ makeMove :: MancalaBoard Int -> Int -> MancalaBoard Int
 makeMove mancalaBoard pitNumber =
   if lastPit == numberOfPits
   then
-    MkMancalaBoard $ xD move (reverse parameters) boards
+    MkMancalaBoard $ helperFunction move (reverse parameters) boards
   else
     if (lastPit < numberOfPits) &&
       (getBoard (boards !! 0) !! lastPit == 0) &&
       stonesNumber < (2 * numberOfPits + 1)
-    then MkMancalaBoard $ xD (pick extra) parameters (reverse boards)
-    else MkMancalaBoard $ xD move parameters (reverse boards)
+    then MkMancalaBoard $ helperFunction (pick extra) parameters (reverse boards)
+    else MkMancalaBoard $ helperFunction move parameters (reverse boards)
   where
     stonesNumber = getBoard (boards !! 0) !! pitNumber
     boards = getBoardSidesList mancalaBoard
@@ -156,6 +159,49 @@ makeMove mancalaBoard pitNumber =
 
 getCurrentPlayer :: MancalaBoard Int -> Player
 getCurrentPlayer mancalaBoard = getPlayer $ (getBoardSidesList mancalaBoard) !! 0
+
+{- |
+  Function that checks if one of the player has won the game
+  (has all of his pits empty, excluding the house)
+ -}
+gameOver :: MancalaBoard Int -> Bool
+gameOver mancalaBoard = any (== True) $ map (checkIfPlayerEnded) (getBoardSidesList mancalaBoard)
+
+getWinner :: MancalaBoard Int -> Player
+getWinner mancalaBoard = (filter (\x -> numberOfPits * initialNumberOfStones
+  <= (getPointsForPlayer mancalaBoard x)) initPlayerList) !! 0
+
+-- |Function that checks if all of pits on his side are empty.
+checkIfPlayerEnded :: (Eq a, Num a) => BoardSide a -> Bool
+checkIfPlayerEnded boardSide = all (== 0) (init $ getBoard boardSide)
+
+{- |
+  Function that returns current score for the player.
+  It is the amount of stones in the house, which belongs to that person, plus
+  amount of stones in every pit on the side of their board.
+-}
+getPointsForPlayer :: MancalaBoard Int -> Player -> Int
+getPointsForPlayer mancalaBoard player =
+  sum (getBoard (getBoardSideForPlayer mancalaBoard player))
+
+-- |Function that returns BoardSide for a player
+getBoardSideForPlayer :: MancalaBoard a -> Player -> BoardSide a
+getBoardSideForPlayer mancalaBoard player
+  | getPlayer (boards !! 0) == player = boards !! 0
+  | otherwise  = boards !! 1
+  where boards = getBoardSidesList mancalaBoard
+
+-- |Function that checks if wished move is possible. 
+checkIfMovePossible :: MancalaBoard Int -> Int -> Bool
+checkIfMovePossible _ pitNumber
+  | pitNumber < 0 = False
+  | pitNumber >= numberOfPits = False -- house'a tez nie mozna ruszac
+checkIfMovePossible mancalaBoard pitNumber
+  | stonesNumber < 1 = False
+  | otherwise = True
+  where
+    stonesNumber = getBoard (boards !! 0) !! pitNumber
+    boards = getBoardSidesList mancalaBoard
 
 ---------- Helper variables and functions for showing boards -------------------
 
