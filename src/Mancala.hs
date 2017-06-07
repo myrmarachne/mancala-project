@@ -17,6 +17,7 @@ module Mancala
       checkIfMovePossible
     ) where
 
+
 import Text.PrettyPrint.Boxes
 import Data.List
 
@@ -167,9 +168,9 @@ getCurrentPlayer mancalaBoard = getPlayer $ (getBoardSidesList mancalaBoard) !! 
 gameOver :: MancalaBoard Int -> Bool
 gameOver mancalaBoard = any (== True) $ map (checkIfPlayerEnded) (getBoardSidesList mancalaBoard)
 
-getWinner :: MancalaBoard Int -> Player
+getWinner :: MancalaBoard Int -> [Player]
 getWinner mancalaBoard = (filter (\x -> numberOfPits * initialNumberOfStones
-  <= (getPointsForPlayer mancalaBoard x)) initPlayerList) !! 0
+  <= (getPointsForPlayer mancalaBoard x)) initPlayerList)
 
 -- |Function that checks if all of pits on his side are empty.
 checkIfPlayerEnded :: (Eq a, Num a) => BoardSide a -> Bool
@@ -191,7 +192,7 @@ getBoardSideForPlayer mancalaBoard player
   | otherwise  = boards !! 1
   where boards = getBoardSidesList mancalaBoard
 
--- |Function that checks if wished move is possible. 
+-- |Function that checks if wished move is possible.
 checkIfMovePossible :: MancalaBoard Int -> Int -> Bool
 checkIfMovePossible _ pitNumber
   | pitNumber < 0 = False
@@ -212,9 +213,3 @@ boardSideToPlayerBox (MkBoardSide player _ ) = text $ show player
 
 boardSideToPitsAndHouseBoxes :: (Show a) => BoardSide a  -> [Box]
 boardSideToPitsAndHouseBoxes (MkBoardSide _ board) = [emptyBox 1 1] ++ map text (map show board)
-
----------------- PRZYKLADOWE PLANSZE PO KILKU RUCHACH --------------------------
-x = makeMove initMancalaBoard 4
-y = makeMove x 1
-y' = makeMove y 0
-z = makeMove y' 0

@@ -37,13 +37,7 @@ possibleMoves mancalaBoard = filter (checkIfMovePossible mancalaBoard) [0..5]
 getScore :: MancalaBoard Int -> Player -> Int -> Int
 getScore mancalaBoard player 0 = getPointsForPlayer mancalaBoard player
 getScore mancalaBoard player depth
-  | gameOver mancalaBoard = if (getWinner mancalaBoard == player)
+  | gameOver mancalaBoard = if (getWinner mancalaBoard == [player])
                               then initialNumberOfStones * numberOfPits * 2 + 1
                               else (-initialNumberOfStones * numberOfPits * 2 - 1)
   | otherwise = getScore (makeMove mancalaBoard (lookahead mancalaBoard (depth-1))) player (depth - 1)
-
----------------- PRZYKLADOWE PLANSZE PO KILKU RUCHACH --------------------------
-x = makeMove initMancalaBoard 4
-y = makeMove x 1
-y' = makeMove y 0
-z = makeMove y' 0

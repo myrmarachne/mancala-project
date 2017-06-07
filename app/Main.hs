@@ -2,9 +2,10 @@ module Main where
 import Mancala
 import AI
 import Text.PrettyPrint.Boxes
+import Text.Read
+import Data.Maybe
 
 main :: IO ()
---main = testFunc
 main = do
   putStrLn "Do you want to start? (y/n)"
   line <- getLine
@@ -22,8 +23,14 @@ dialog board player = do
           print board
           putStrLn "Which pit do you want to use? (type 1 - 6)"
           line <- getLine
-          let number = read line :: Int
-          dialog (makeMove board $ number - 1) player
+          let maybeNumber = readMaybe line :: Maybe Int
+          if maybeNumber == Nothing
+            then dialog board player
+          else
+
+            if (checkIfMovePossible board $  (fromJust maybeNumber) - 1)
+            then dialog (makeMove board $ (fromJust maybeNumber) - 1) player
+            else dialog board player
         else dialog (doAIMove board) player
 
 
