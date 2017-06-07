@@ -2,8 +2,8 @@ module Main where
 import Mancala
 import AI
 import Text.PrettyPrint.Boxes
-import Text.Read
-import Data.Maybe
+import Text.Read (readMaybe)
+import Data.Maybe (fromJust)
 
 main :: IO ()
 main = do
